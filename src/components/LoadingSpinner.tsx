@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { UI_CONSTANTS } from '../constants';
+import { normalize } from '../utils/normalize';
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'large';
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: UI_CONSTANTS.SPACING.MD,
-    fontSize: 16,
+    fontSize: normalize(16),
     color: UI_CONSTANTS.COLORS.TEXT_SECONDARY,
     textAlign: 'center',
   },

@@ -10,6 +10,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Event } from '../types';
 import { UI_CONSTANTS } from '../constants';
+import { formatEventDate, formatTime, formatPrice, formatAvailableSpots } from '../utils';
+import { normalize } from '../utils/normalize';
 
 interface EventCardProps {
   event: Event;
@@ -22,28 +24,6 @@ export const EventCard: React.FC<EventCardProps> = ({
   onPress,
   style,
 }) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
-
-  const formatTime = (timeString: string) => {
-    const time = new Date(`2000-01-01T${timeString}`);
-    return time.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
-
-  const formatPrice = (price: number) => {
-    return price === 0 ? 'Free' : `$${price}`;
-  };
-
   return (
     <TouchableOpacity
       style={[styles.container, style]}
@@ -58,17 +38,17 @@ export const EventCard: React.FC<EventCardProps> = ({
         <View style={styles.dateTimeContainer}>
           <Ionicons
             name="calendar-outline"
-            size={16}
+            size={normalize(16)}
             color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}
           />
           <Text style={styles.dateTime}>
-            {formatDate(event.date)} • {formatTime(event.time)}
+            {formatEventDate(event.date)} • {formatTime(event.time)}
           </Text>
         </View>
         <View style={styles.locationContainer}>
           <Ionicons
             name="location-outline"
-            size={16}
+            size={normalize(16)}
             color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}
           />
           <Text style={styles.location} numberOfLines={1}>
@@ -82,11 +62,11 @@ export const EventCard: React.FC<EventCardProps> = ({
           <View style={styles.spotsContainer}>
             <Ionicons
               name="people-outline"
-              size={16}
+              size={normalize(16)}
               color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}
             />
             <Text style={styles.spots}>
-              {event.availableSpots} spots left
+              {formatAvailableSpots(event.availableSpots)}
             </Text>
           </View>
         </View>
@@ -102,16 +82,16 @@ const styles = StyleSheet.create({
     marginBottom: UI_CONSTANTS.SPACING.MD,
     shadowColor: '#000',
     shadowOffset: {
-      width: 0,
-      height: 2,
+      width: normalize(0),
+      height: normalize(2),
     },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: normalize(4),
+    elevation: normalize(3),
   },
   image: {
     width: '100%',
-    height: 200,
+    height: normalize(200),
     borderTopLeftRadius: UI_CONSTANTS.BORDER_RADIUS.LG,
     borderTopRightRadius: UI_CONSTANTS.BORDER_RADIUS.LG,
     resizeMode: 'cover',
@@ -120,7 +100,7 @@ const styles = StyleSheet.create({
     padding: UI_CONSTANTS.SPACING.MD,
   },
   title: {
-    fontSize: 18,
+    fontSize: normalize(18),
     fontWeight: '600',
     color: UI_CONSTANTS.COLORS.TEXT_PRIMARY,
     marginBottom: UI_CONSTANTS.SPACING.SM,
@@ -131,7 +111,7 @@ const styles = StyleSheet.create({
     marginBottom: UI_CONSTANTS.SPACING.XS,
   },
   dateTime: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: UI_CONSTANTS.COLORS.TEXT_SECONDARY,
     marginLeft: UI_CONSTANTS.SPACING.XS,
   },
@@ -141,7 +121,7 @@ const styles = StyleSheet.create({
     marginBottom: UI_CONSTANTS.SPACING.MD,
   },
   location: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: UI_CONSTANTS.COLORS.TEXT_SECONDARY,
     marginLeft: UI_CONSTANTS.SPACING.XS,
     flex: 1,
@@ -158,7 +138,7 @@ const styles = StyleSheet.create({
     borderRadius: UI_CONSTANTS.BORDER_RADIUS.SM,
   },
   price: {
-    fontSize: 16,
+    fontSize: normalize(16),
     fontWeight: '600',
     color: '#FFFFFF',
   },
@@ -167,7 +147,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   spots: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: UI_CONSTANTS.COLORS.TEXT_SECONDARY,
     marginLeft: UI_CONSTANTS.SPACING.XS,
   },

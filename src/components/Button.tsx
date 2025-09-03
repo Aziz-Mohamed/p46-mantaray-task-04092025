@@ -8,6 +8,7 @@ import {
   TextStyle,
 } from 'react-native';
 import { UI_CONSTANTS } from '../constants';
+import { normalize } from '../utils/normalize';
 
 interface ButtonProps {
   title: string;
@@ -80,23 +81,23 @@ const styles = StyleSheet.create({
   },
   outline: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
+    borderWidth: normalize(1),
     borderColor: UI_CONSTANTS.COLORS.PRIMARY,
   },
   small: {
     paddingVertical: UI_CONSTANTS.SPACING.SM,
     paddingHorizontal: UI_CONSTANTS.SPACING.MD,
-    minHeight: 36,
+    minHeight: normalize(36),
   },
   medium: {
     paddingVertical: UI_CONSTANTS.SPACING.MD,
     paddingHorizontal: UI_CONSTANTS.SPACING.LG,
-    minHeight: 48,
+    minHeight: normalize(48),
   },
   large: {
     paddingVertical: UI_CONSTANTS.SPACING.LG,
     paddingHorizontal: UI_CONSTANTS.SPACING.XL,
-    minHeight: 56,
+    minHeight: normalize(56),
   },
   disabled: {
     opacity: 0.5,
@@ -115,13 +116,13 @@ const styles = StyleSheet.create({
     color: UI_CONSTANTS.COLORS.PRIMARY,
   },
   smallText: {
-    fontSize: 14,
+    fontSize: normalize(14),
   },
   mediumText: {
-    fontSize: 16,
+    fontSize: normalize(16),
   },
   largeText: {
-    fontSize: 18,
+    fontSize: normalize(18),
   },
   disabledText: {
     opacity: 0.7,

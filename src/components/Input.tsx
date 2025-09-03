@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { UI_CONSTANTS } from '../constants';
+import { normalize } from '../utils/normalize';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -59,7 +60,7 @@ export const Input: React.FC<InputProps> = ({
         {leftIcon && (
           <Ionicons
             name={leftIcon}
-            size={20}
+            size={normalize(20)}
             color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}
             style={styles.leftIcon}
           />
@@ -79,7 +80,7 @@ export const Input: React.FC<InputProps> = ({
           >
             <Ionicons
               name={isPasswordVisible ? 'eye-off' : 'eye'}
-              size={20}
+              size={normalize(20)}
               color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}
             />
           </TouchableOpacity>
@@ -91,7 +92,7 @@ export const Input: React.FC<InputProps> = ({
           >
             <Ionicons
               name={rightIcon}
-              size={20}
+              size={normalize(20)}
               color={UI_CONSTANTS.COLORS.TEXT_SECONDARY}
             />
           </TouchableOpacity>
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     marginBottom: UI_CONSTANTS.SPACING.MD,
   },
   label: {
-    fontSize: 16,
+    fontSize: normalize(16),
     fontWeight: '500',
     color: UI_CONSTANTS.COLORS.TEXT_PRIMARY,
     marginBottom: UI_CONSTANTS.SPACING.SM,
@@ -119,24 +120,24 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    height: 48,
-    borderWidth: 1,
+    height: normalize(48),
+    borderWidth: normalize(1),
     borderColor: '#E5E5EA',
     borderRadius: UI_CONSTANTS.BORDER_RADIUS.MD,
     paddingHorizontal: UI_CONSTANTS.SPACING.MD,
-    fontSize: 16,
+    fontSize: normalize(16),
     color: UI_CONSTANTS.COLORS.TEXT_PRIMARY,
     backgroundColor: UI_CONSTANTS.COLORS.SURFACE,
   },
   inputWithLeftIcon: {
-    paddingLeft: 48,
+    paddingLeft: normalize(48),
   },
   inputWithRightIcon: {
-    paddingRight: 48,
+    paddingRight: normalize(48),
   },
   inputFocused: {
     borderColor: UI_CONSTANTS.COLORS.PRIMARY,
-    borderWidth: 2,
+    borderWidth: normalize(2),
   },
   inputError: {
     borderColor: UI_CONSTANTS.COLORS.ERROR,
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
     padding: UI_CONSTANTS.SPACING.SM,
   },
   errorText: {
-    fontSize: 14,
+    fontSize: normalize(14),
     color: UI_CONSTANTS.COLORS.ERROR,
     marginTop: UI_CONSTANTS.SPACING.XS,
   },
