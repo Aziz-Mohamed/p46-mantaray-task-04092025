@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "p46-mantaray-task-04092025",
-    "slug": "p46-mantaray-task-04092025",
+    "name": "EventBook",
+    "slug": "eventbook",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "scheme": "eventbook",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -24,6 +25,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
