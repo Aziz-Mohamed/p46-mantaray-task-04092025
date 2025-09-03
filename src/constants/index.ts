@@ -1,5 +1,5 @@
 // API Configuration
-export const API_BASE_URL = 'https://your-mockapi-url.mockapi.io/api/v1';
+export const API_BASE_URL = 'https://YOUR_PROJECT_ID.mockapi.io/api/v1';
 
 // API Endpoints
 export const API_ENDPOINTS = {
