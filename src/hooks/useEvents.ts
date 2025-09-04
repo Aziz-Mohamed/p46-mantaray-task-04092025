@@ -21,13 +21,10 @@ export const useEvents = (page: number = 1, limit: number = 10) => {
   return useQuery({
     queryKey: eventKeys.list({ page, limit }),
     queryFn: async () => {
-      console.log('🔍 useEvents: Starting fetch with page:', page, 'limit:', limit);
       try {
         const result = await eventService.getEvents({ page, limit });
-        console.log('✅ useEvents: Success - got', result.data.length, 'events');
         return result;
       } catch (error) {
-        console.error('❌ useEvents: Error:', error.message);
         throw error;
       }
     },

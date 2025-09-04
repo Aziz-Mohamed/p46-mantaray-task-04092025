@@ -24,10 +24,9 @@ export const useLogin = () => {
     onSuccess: (data: AuthResponse) => {
       // Store auth data (implement based on your storage solution)
       // You can integrate with your auth provider here
-      console.log('Login successful:', data);
     },
     onError: (error) => {
-      console.error('Login failed:', error);
+      // surface error to UI via mutation.error
     },
   });
 };
@@ -41,10 +40,9 @@ export const useSignup = () => {
       authService.signup(credentials),
     onSuccess: (data: AuthResponse) => {
       // Store auth data (implement based on your storage solution)
-      console.log('Signup successful:', data);
     },
     onError: (error) => {
-      console.error('Signup failed:', error);
+      // surface error to UI via mutation.error
     },
   });
 };
@@ -59,10 +57,9 @@ export const useLogout = () => {
       // Clear all cached data
       queryClient.clear();
       // Clear auth data from storage
-      console.log('Logout successful');
     },
     onError: (error) => {
-      console.error('Logout failed:', error);
+      // surface error to UI via mutation.error
     },
   });
 };
@@ -100,10 +97,9 @@ export const useRefreshToken = () => {
     mutationFn: () => authService.refreshToken(),
     onSuccess: (data) => {
       // Update token in storage
-      console.log('Token refreshed:', data);
     },
     onError: (error) => {
-      console.error('Token refresh failed:', error);
+      // surface error to UI via mutation.error
     },
   });
 };

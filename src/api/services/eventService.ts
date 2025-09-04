@@ -10,21 +10,15 @@ import { EventTransformer, ApiEvent } from '../transformers';
  */
 export class EventService {
   async getEvents(filters: EventFilters = {}): Promise<PaginatedResponse<Event>> {
-    console.log('🔍 EventService.getEvents: Starting with filters:', filters);
-    
     const queryString = buildQueryParams(filters);
     const endpoint = queryString 
       ? `${API_ENDPOINTS.EVENTS}?${queryString}`
       : API_ENDPOINTS.EVENTS;
     
-    console.log('🔍 EventService.getEvents: Fetching from:', endpoint);
-    
     try {
       const rawEvents = await apiClient.get<ApiEvent[]>(endpoint);
-      console.log('✅ EventService.getEvents: Raw events received:', rawEvents.length);
       
       const transformedEvents = EventTransformer.toEventArray(rawEvents);
-      console.log('✅ EventService.getEvents: Transformed events:', transformedEvents.length);
       
       const result = {
         data: transformedEvents,
@@ -32,8 +26,6 @@ export class EventService {
         page: filters.page || 1,
         limit: filters.limit || 10,
       };
-      
-      console.log('✅ EventService.getEvents: Final result:', result);
       return result;
     } catch (error) {
       console.error('❌ EventService.getEvents: Error:', error);
