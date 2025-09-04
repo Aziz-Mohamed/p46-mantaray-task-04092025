@@ -26,6 +26,7 @@
     |-- favicon.png
     |-- icon.png
     |-- splash-icon.png
+|-- debug-auth.tsx
 |-- index.ts
 |-- package-lock.json
 |-- package.json
@@ -76,4 +77,6 @@
         |-- index.ts
         |-- normalize.ts
         |-- validation.ts
+|-- test-auth.js
+|-- test-local-auth.js
 |-- tsconfig.json

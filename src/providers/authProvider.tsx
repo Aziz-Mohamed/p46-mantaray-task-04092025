@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import * as SecureStore from 'expo-secure-store';
 import { User, LoginCredentials, SignupCredentials, AuthResponse } from '../types';
 import { STORAGE_KEYS } from '../constants';
-import { authService } from '../services/authService';
+import { authService } from '../api/services/authService';
 
 interface AuthContextType {
   user: User | null;
@@ -13,6 +13,7 @@ interface AuthContextType {
   signup: (credentials: SignupCredentials) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  getAllUsers: () => User[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,7 +29,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const isAuthenticated = !!user && !!token;
 
-  // Initialize auth state from storage
+  // Initialize auth state from storage and load users
   useEffect(() => {
     initializeAuth();
   }, []);
@@ -36,6 +37,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const initializeAuth = async () => {
     try {
       setIsLoading(true);
+      
+      // First, initialize users data
+      await authService.initializeUsers();
+      
+      // Then check for stored auth data
       const storedToken = await SecureStore.getItemAsync(STORAGE_KEYS.AUTH_TOKEN);
       const storedUser = await SecureStore.getItemAsync(STORAGE_KEYS.USER_DATA);
 
@@ -104,9 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       setIsLoading(true);
-      if (token) {
-        await authService.logout(token);
-      }
+      await authService.logout(); // Remove token parameter
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
@@ -118,14 +122,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshUser = async () => {
     try {
       if (!token) return;
-      const userData = await authService.getUserProfile(token);
+      const userData = await authService.getUserProfile(); // Remove token parameter
       await SecureStore.setItemAsync(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
       setUser(userData);
     } catch (error) {
       console.error('Failed to refresh user:', error);
-      // If refresh fails, logout user
       await logout();
     }
+  };
+
+  const getAllUsers = (): User[] => {
+    return authService.getUsers();
   };
 
   const value: AuthContextType = {
@@ -137,6 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signup,
     logout,
     refreshUser,
+    getAllUsers,
   };
 
   return (

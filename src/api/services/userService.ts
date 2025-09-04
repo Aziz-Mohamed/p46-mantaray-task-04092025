@@ -1,5 +1,6 @@
 import { apiClient } from '../client';
-import { API_ENDPOINTS, buildQueryParams, PaginationParams } from '../endpoints';
+import { API_ENDPOINTS } from '../../constants';
+import { buildQueryParams, PaginationParams } from '../endpoints';
 import { User } from '../../types';
 import { UserTransformer, ApiUser } from '../transformers';
 
@@ -11,40 +12,39 @@ export class UserService {
   async getUsers(params: PaginationParams = {}): Promise<User[]> {
     const queryString = buildQueryParams(params);
     const endpoint = queryString 
-      ? `${API_ENDPOINTS.USERS.BASE}?${queryString}`
-      : API_ENDPOINTS.USERS.BASE;
+      ? `${API_ENDPOINTS.USERS}?${queryString}`
+      : API_ENDPOINTS.USERS;
     
     const rawUsers = await apiClient.get<ApiUser[]>(endpoint);
     return UserTransformer.toUserArray(rawUsers);
   }
 
   async getUserById(id: string): Promise<User> {
-    const rawUser = await apiClient.get<ApiUser>(API_ENDPOINTS.USERS.BY_ID(id));
+    const rawUser = await apiClient.get<ApiUser>(`${API_ENDPOINTS.USERS}/${id}`);
     return UserTransformer.toUser(rawUser);
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
-    const queryString = buildQueryParams({ email });
-    const endpoint = `${API_ENDPOINTS.USERS.BASE}?${queryString}`;
-    
-    const rawUsers = await apiClient.get<ApiUser[]>(endpoint);
-    return rawUsers.length > 0 ? UserTransformer.toUser(rawUsers[0]) : null;
+    // MockAPI doesn't support filtering by email, so we fetch all users and filter client-side
+    const rawUsers = await apiClient.get<ApiUser[]>(API_ENDPOINTS.USERS);
+    const users = UserTransformer.toUserArray(rawUsers);
+    return users.find(user => user.email === email) || null;
   }
 
   async createUser(userData: Omit<User, 'id' | 'createdAt'>): Promise<User> {
     const apiUserData = UserTransformer.toApiUser(userData);
-    const rawUser = await apiClient.post<ApiUser>(API_ENDPOINTS.USERS.BASE, apiUserData);
+    const rawUser = await apiClient.post<ApiUser>(API_ENDPOINTS.USERS, apiUserData);
     return UserTransformer.toUser(rawUser);
   }
 
   async updateUser(id: string, userData: Partial<User>): Promise<User> {
     const apiUserData = UserTransformer.toApiUser(userData);
-    const rawUser = await apiClient.put<ApiUser>(API_ENDPOINTS.USERS.BY_ID(id), apiUserData);
+    const rawUser = await apiClient.put<ApiUser>(`${API_ENDPOINTS.USERS}/${id}`, apiUserData);
     return UserTransformer.toUser(rawUser);
   }
 
   async deleteUser(id: string): Promise<void> {
-    return apiClient.delete<void>(API_ENDPOINTS.USERS.BY_ID(id));
+    return apiClient.delete<void>(`${API_ENDPOINTS.USERS}/${id}`);
   }
 
   async searchUsers(query: string, params: PaginationParams = {}): Promise<User[]> {
