@@ -7,6 +7,7 @@ import {
   Image,
   Alert,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -116,6 +117,7 @@ export default function EventDetailsScreen() {
   }
 
   return (
+    <SafeAreaView style={styles.safeArea}>
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Image source={{ uri: event.image }} style={styles.image} />
       
@@ -199,13 +201,15 @@ export default function EventDetailsScreen() {
 
         <View style={styles.actionContainer}>
           {isRegistered ? (
-            <Button
-              title="Cancel Registration"
-              onPress={handleCancel}
-              loading={cancelRegistrationMutation.isPending}
-              style={[styles.registerButton, { backgroundColor: UI_CONSTANTS.COLORS.ERROR }]}
-              textStyle={{ color: '#FFFFFF' }}
-            />
+            <View style={[styles.registerButton, { backgroundColor: UI_CONSTANTS.COLORS.ERROR, borderRadius: 12 }]}>
+              <Button
+                title="Cancel Registration"
+                onPress={handleCancel}
+                loading={cancelRegistrationMutation.isPending}
+                style={{}}
+                textStyle={{ color: '#FFFFFF' }}
+              />
+            </View>
           ) : (
             <Button
               title={
@@ -222,11 +226,16 @@ export default function EventDetailsScreen() {
         </View>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    backgroundColor: UI_CONSTANTS.COLORS.BACKGROUND,
+  },
+  safeArea: {
     flex: 1,
     backgroundColor: UI_CONSTANTS.COLORS.BACKGROUND,
   },

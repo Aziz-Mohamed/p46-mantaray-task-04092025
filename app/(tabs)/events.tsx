@@ -6,16 +6,16 @@ import {
   FlatList,
   RefreshControl,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useEvents } from '../../src/hooks/useEvents';
-import { EventCard, Input, LoadingSpinner } from '../../src/components';
+import { EventCard, LoadingSpinner } from '../../src/components';
 import { UI_CONSTANTS } from '../../src/constants';
 import { normalize } from '../../src/utils/normalize';
 
 export default function EventsScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   
   const {
@@ -26,10 +26,7 @@ export default function EventsScreen() {
     isRefetching,
   } = useEvents(page, 10);
 
-  // Debug logging
-  console.log('🔍 EventsScreen: isLoading:', isLoading);
-  console.log('🔍 EventsScreen: isError:', isError);
-  console.log('🔍 EventsScreen: eventsData:', eventsData);
+  // Debug logging removed
 
   const handleEventPress = (eventId: string) => {
     router.push(`/event/${eventId}`);
@@ -101,28 +98,11 @@ export default function EventsScreen() {
   const events = eventsData?.data || [];
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Events</Text>
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={() => {
-            // TODO: Implement logout
-          }}
-        >
-          <Ionicons name="log-out-outline" size={normalize(24)} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+      {/* Header removed to rely on native navigation header */}
 
-      <View style={styles.searchContainer}>
-        <Input
-          placeholder="Search events..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          leftIcon="search-outline"
-          style={styles.searchInput}
-        />
-      </View>
+      {/* Search removed for now */}
 
       <FlatList
         data={events}
@@ -142,7 +122,8 @@ export default function EventsScreen() {
         ListEmptyComponent={renderEmpty}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -151,30 +132,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: UI_CONSTANTS.COLORS.BACKGROUND,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: UI_CONSTANTS.SPACING.LG,
-    paddingVertical: UI_CONSTANTS.SPACING.MD,
-    backgroundColor: UI_CONSTANTS.COLORS.PRIMARY,
+  safeArea: {
+    flex: 1,
+    backgroundColor: UI_CONSTANTS.COLORS.BACKGROUND,
   },
-  title: {
-    fontSize: normalize(24),
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  logoutButton: {
-    padding: UI_CONSTANTS.SPACING.SM,
-  },
-  searchContainer: {
-    paddingHorizontal: UI_CONSTANTS.SPACING.LG,
-    paddingVertical: UI_CONSTANTS.SPACING.MD,
-    backgroundColor: UI_CONSTANTS.COLORS.SURFACE,
-  },
-  searchInput: {
-    marginBottom: 0,
-  },
+  // header styles removed
   listContent: {
     padding: UI_CONSTANTS.SPACING.LG,
   },

@@ -1,5 +1,22 @@
-import { Tabs } from 'expo-router';
+import { Tabs, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native';
+import { useAuth } from '../../src/providers/authProvider';
+
+function HeaderLogoutButton() {
+  const { logout, isLoading } = useAuth();
+  const handlePress = async () => {
+    try {
+      await logout();
+      router.replace('/(auth)/login');
+    } catch {}
+  };
+  return (
+    <TouchableOpacity onPress={handlePress} disabled={isLoading} style={{ paddingRight: 12 }}>
+      <Ionicons name="log-out-outline" size={22} color="#fff" />
+    </TouchableOpacity>
+  );
+}
 
 export default function TabLayout() {
   return (
@@ -24,6 +41,7 @@ export default function TabLayout() {
         name="events"
         options={{
           title: 'Events',
+          headerRight: () => <HeaderLogoutButton />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" size={size} color={color} />
           ),
@@ -33,6 +51,7 @@ export default function TabLayout() {
         name="dashboard"
         options={{
           title: 'My Events',
+          headerRight: () => <HeaderLogoutButton />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),

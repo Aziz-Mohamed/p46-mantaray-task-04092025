@@ -7,6 +7,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -148,16 +149,9 @@ export default function DashboardScreen() {
   const registrationList = registrations || [];
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <Text style={styles.greeting}>Hello, {user?.name}</Text>
-          <Text style={styles.subtitle}>Your registered events</Text>
-        </View>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={normalize(24)} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+      {/* Header removed to use native navigation header */}
 
       <FlatList
         data={registrationList}
@@ -174,7 +168,8 @@ export default function DashboardScreen() {
         ListEmptyComponent={renderEmpty}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -183,31 +178,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: UI_CONSTANTS.COLORS.BACKGROUND,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: UI_CONSTANTS.SPACING.LG,
-    paddingVertical: UI_CONSTANTS.SPACING.MD,
-    backgroundColor: UI_CONSTANTS.COLORS.PRIMARY,
-  },
-  userInfo: {
+  safeArea: {
     flex: 1,
+    backgroundColor: UI_CONSTANTS.COLORS.BACKGROUND,
   },
-  greeting: {
-    fontSize: normalize(20),
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  subtitle: {
-    fontSize: normalize(14),
-    color: '#FFFFFF',
-    opacity: 0.8,
-    marginTop: UI_CONSTANTS.SPACING.XS,
-  },
-  logoutButton: {
-    padding: UI_CONSTANTS.SPACING.SM,
-  },
+  // header styles removed
   listContent: {
     padding: UI_CONSTANTS.SPACING.LG,
   },
