@@ -88,6 +88,7 @@ export class AuthService {
       email: credentials.email,
       password: credentials.password,
       avatar: undefined,
+      registeredEventIds: [],
       createdAt: new Date().toISOString(),
     };
 

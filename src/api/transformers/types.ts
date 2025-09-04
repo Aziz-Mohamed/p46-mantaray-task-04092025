@@ -23,6 +23,7 @@ export interface ApiUser {
   email: string;
   password: string;
   avatar?: string;
+  registeredEventIds?: string[];
   createdAt: string;
 }
 

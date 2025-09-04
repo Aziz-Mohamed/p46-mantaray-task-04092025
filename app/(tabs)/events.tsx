@@ -26,6 +26,11 @@ export default function EventsScreen() {
     isRefetching,
   } = useEvents(page, 10);
 
+  // Debug logging
+  console.log('🔍 EventsScreen: isLoading:', isLoading);
+  console.log('🔍 EventsScreen: isError:', isError);
+  console.log('🔍 EventsScreen: eventsData:', eventsData);
+
   const handleEventPress = (eventId: string) => {
     router.push(`/event/${eventId}`);
   };

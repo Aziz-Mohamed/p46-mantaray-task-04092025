@@ -16,6 +16,7 @@ export class UserTransformer {
       email: apiUser.email,
       password: apiUser.password,
       avatar: apiUser.avatar,
+      registeredEventIds: apiUser.registeredEventIds,
       createdAt: apiUser.createdAt,
     };
   }
@@ -30,6 +31,7 @@ export class UserTransformer {
     if (user.email) apiUser.email = user.email;
     if (user.password) apiUser.password = user.password;
     if (user.avatar !== undefined) apiUser.avatar = user.avatar;
+    if (user.registeredEventIds !== undefined) apiUser.registeredEventIds = user.registeredEventIds;
     if (user.createdAt) apiUser.createdAt = user.createdAt;
 
     return apiUser;

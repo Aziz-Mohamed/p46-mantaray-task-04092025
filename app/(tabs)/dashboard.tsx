@@ -33,7 +33,7 @@ export default function DashboardScreen() {
     router.push(`/event/${eventId}`);
   };
 
-  const handleCancelRegistration = (registrationId: string, eventTitle: string) => {
+  const handleCancelRegistration = (eventId: string, eventTitle: string) => {
     Alert.alert(
       'Cancel Registration',
       `Are you sure you want to cancel your registration for "${eventTitle}"?`,
@@ -44,7 +44,7 @@ export default function DashboardScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await cancelRegistrationMutation.mutateAsync(registrationId);
+              await cancelRegistrationMutation.mutateAsync(eventId);
               Alert.alert('Success', 'Your registration has been cancelled.');
             } catch (error) {
               Alert.alert(
@@ -89,7 +89,7 @@ export default function DashboardScreen() {
       <View style={styles.registrationActions}>
         <TouchableOpacity
           style={styles.cancelButton}
-          onPress={() => handleCancelRegistration(item.id, item.event.title)}
+          onPress={() => handleCancelRegistration(item.event.id, item.event.title)}
           disabled={cancelRegistrationMutation.isPending}
         >
           <Ionicons name="close-circle-outline" size={normalize(20)} color={UI_CONSTANTS.COLORS.ERROR} />

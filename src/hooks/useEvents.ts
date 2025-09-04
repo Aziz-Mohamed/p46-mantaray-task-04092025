@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { eventService } from '../api/services/eventService';
+import { registrationService } from '../api/services/registrationService';
+import { userService } from '../api/services/userService';
 import { useAuth } from '../providers/authProvider';
 import { Event, Registration } from '../types';
 
@@ -18,7 +20,17 @@ export const eventKeys = {
 export const useEvents = (page: number = 1, limit: number = 10) => {
   return useQuery({
     queryKey: eventKeys.list({ page, limit }),
-    queryFn: () => eventService.getEvents({ page, limit }),
+    queryFn: async () => {
+      console.log('🔍 useEvents: Starting fetch with page:', page, 'limit:', limit);
+      try {
+        const result = await eventService.getEvents({ page, limit });
+        console.log('✅ useEvents: Success - got', result.data.length, 'events');
+        return result;
+      } catch (error) {
+        console.error('❌ useEvents: Error:', error.message);
+        throw error;
+      }
+    },
   });
 };
 
@@ -43,14 +55,17 @@ export const useSearchEvents = (query: string, page: number = 1, limit: number =
 // Hook to register for an event
 export const useRegisterEvent = () => {
   const queryClient = useQueryClient();
-  const { token } = useAuth();
+  const { user } = useAuth();
 
   return useMutation({
-    mutationFn: (eventId: string) => {
-      if (!token) throw new Error('No authentication token');
-      return eventService.registerForEvent(eventId, token);
+    mutationFn: async (eventId: string) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      const currentUser = await userService.getUserById(user.id);
+      const nextIds = Array.from(new Set([...(currentUser.registeredEventIds || []), eventId]));
+      await userService.updateUser(user.id, { registeredEventIds: nextIds });
+      return { eventId, userId: user.id } as any;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Invalidate and refetch user registrations
       queryClient.invalidateQueries({ queryKey: eventKeys.registrations() });
       
@@ -65,46 +80,59 @@ export const useRegisterEvent = () => {
           };
         }
       );
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: eventKeys.userRegistrations(user.id) });
+      }
     },
   });
 };
 
 // Hook to get user's registrations
 export const useUserRegistrations = () => {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
 
   return useQuery({
     queryKey: eventKeys.userRegistrations(user?.id || ''),
-    queryFn: () => {
-      if (!user?.id || !token) throw new Error('User not authenticated');
-      return eventService.getUserRegistrations(user.id, token);
+    // Never throw just because user isn't set yet; return empty list instead
+    queryFn: async () => {
+      if (!user?.id) return [];
+      // Try dedicated registrations resource first
+      const regs = await registrationService.getUserRegistrations(user.id);
+      if (regs.length > 0) return regs;
+      // Fallback: mirror from user document's registeredEventIds
+      const u = await userService.getUserById(user.id);
+      const ids = u.registeredEventIds || [];
+      // Map to minimal registration-like objects for UI
+      return ids.map((eventId, idx) => ({
+        id: `${user.id}-${eventId}-${idx}`,
+        userId: user.id,
+        eventId,
+        registeredAt: new Date().toISOString(),
+        status: 'confirmed' as const,
+      }));
     },
-    enabled: !!user?.id && !!token,
+    enabled: true,
+    retry: 1,
   });
 };
 
 // Hook to cancel a registration
 export const useCancelRegistration = () => {
   const queryClient = useQueryClient();
-  const { token } = useAuth();
+  const { user } = useAuth();
 
   return useMutation({
-    mutationFn: (registrationId: string) => {
-      if (!token) throw new Error('No authentication token');
-      return eventService.cancelRegistration(registrationId, token);
+    mutationFn: async (eventId: string) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      const currentUser = await userService.getUserById(user.id);
+      const nextIds = (currentUser.registeredEventIds || []).filter(id => id !== eventId);
+      await userService.updateUser(user.id, { registeredEventIds: nextIds });
     },
-    onSuccess: (_, registrationId) => {
-      // Invalidate user registrations
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventKeys.registrations() });
-      
-      // Remove the registration from cache
-      queryClient.setQueryData(
-        eventKeys.registrations(),
-        (oldData: Registration[] | undefined) => {
-          if (!oldData) return oldData;
-          return oldData.filter(reg => reg.id !== registrationId);
-        }
-      );
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: eventKeys.userRegistrations(user.id) });
+      }
     },
   });
 };
