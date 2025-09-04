@@ -24,7 +24,6 @@ export class AuthService {
     try {
       AuthService.users = await userService.getUsers();
       AuthService.isInitialized = true;
-      console.log(`✅ Loaded ${AuthService.users.length} users locally`);
     } catch (error) {
       console.error('Failed to initialize users:', error);
       throw new Error('Failed to load users data');

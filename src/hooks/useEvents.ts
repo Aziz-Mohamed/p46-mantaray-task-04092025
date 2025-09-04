@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { eventService } from '../services/eventService';
+import { eventService } from '../api/services/eventService';
 import { useAuth } from '../providers/authProvider';
 import { Event, Registration } from '../types';
 
@@ -18,8 +18,7 @@ export const eventKeys = {
 export const useEvents = (page: number = 1, limit: number = 10) => {
   return useQuery({
     queryKey: eventKeys.list({ page, limit }),
-    queryFn: () => eventService.getEvents(page, limit),
-    keepPreviousData: true,
+    queryFn: () => eventService.getEvents({ page, limit }),
   });
 };
 
@@ -36,9 +35,8 @@ export const useEvent = (id: string) => {
 export const useSearchEvents = (query: string, page: number = 1, limit: number = 10) => {
   return useQuery({
     queryKey: eventKeys.list({ search: query, page, limit }),
-    queryFn: () => eventService.searchEvents(query, page, limit),
+    queryFn: () => eventService.searchEvents(query, { page, limit }),
     enabled: !!query && query.length > 2,
-    keepPreviousData: true,
   });
 };
 

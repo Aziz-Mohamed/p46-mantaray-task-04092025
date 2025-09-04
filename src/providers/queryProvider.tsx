@@ -11,7 +11,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: APP_CONFIG.STALE_TIME,
-      cacheTime: APP_CONFIG.CACHE_TIME,
+      gcTime: APP_CONFIG.CACHE_TIME,
       retry: (failureCount, error) => {
         // Don't retry on 4xx errors (client errors)
         if (error instanceof Error && 'status' in error) {

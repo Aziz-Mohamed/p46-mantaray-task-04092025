@@ -1,5 +1,6 @@
 import { apiClient } from '../client';
-import { API_ENDPOINTS, buildQueryParams, EventFilters } from '../endpoints';
+import { API_ENDPOINTS } from '../../constants';
+import { buildQueryParams, EventFilters } from '../endpoints';
 import { Event, PaginatedResponse } from '../../types';
 import { EventTransformer, ApiEvent } from '../transformers';
 
@@ -11,8 +12,8 @@ export class EventService {
   async getEvents(filters: EventFilters = {}): Promise<PaginatedResponse<Event>> {
     const queryString = buildQueryParams(filters);
     const endpoint = queryString 
-      ? `${API_ENDPOINTS.EVENTS.BASE}?${queryString}`
-      : API_ENDPOINTS.EVENTS.BASE;
+      ? `${API_ENDPOINTS.EVENTS}?${queryString}`
+      : API_ENDPOINTS.EVENTS;
     
     const rawEvents = await apiClient.get<ApiEvent[]>(endpoint);
     const transformedEvents = EventTransformer.toEventArray(rawEvents);
@@ -26,7 +27,7 @@ export class EventService {
   }
 
   async getEventById(id: string): Promise<Event> {
-    const rawEvent = await apiClient.get<ApiEvent>(API_ENDPOINTS.EVENTS.BY_ID(id));
+    const rawEvent = await apiClient.get<ApiEvent>(`${API_ENDPOINTS.EVENTS}/${id}`);
     return EventTransformer.toEvent(rawEvent);
   }
 
@@ -85,18 +86,18 @@ export class EventService {
 
   async createEvent(eventData: Omit<Event, 'id' | 'createdAt'>): Promise<Event> {
     const apiEventData = EventTransformer.toApiEvent(eventData);
-    const rawEvent = await apiClient.post<ApiEvent>(API_ENDPOINTS.EVENTS.BASE, apiEventData);
+    const rawEvent = await apiClient.post<ApiEvent>(API_ENDPOINTS.EVENTS, apiEventData);
     return EventTransformer.toEvent(rawEvent);
   }
 
   async updateEvent(id: string, eventData: Partial<Event>): Promise<Event> {
     const apiEventData = EventTransformer.toApiEvent(eventData);
-    const rawEvent = await apiClient.put<ApiEvent>(API_ENDPOINTS.EVENTS.BY_ID(id), apiEventData);
+    const rawEvent = await apiClient.put<ApiEvent>(`${API_ENDPOINTS.EVENTS}/${id}`, apiEventData);
     return EventTransformer.toEvent(rawEvent);
   }
 
   async deleteEvent(id: string): Promise<void> {
-    return apiClient.delete<void>(API_ENDPOINTS.EVENTS.BY_ID(id));
+    return apiClient.delete<void>(`${API_ENDPOINTS.EVENTS}/${id}`);
   }
 }
 

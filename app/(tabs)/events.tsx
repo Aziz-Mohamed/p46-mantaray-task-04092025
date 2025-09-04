@@ -24,9 +24,6 @@ export default function EventsScreen() {
     isError,
     refetch,
     isRefetching,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
   } = useEvents(page, 10);
 
   const handleEventPress = (eventId: string) => {
@@ -39,10 +36,8 @@ export default function EventsScreen() {
   };
 
   const handleLoadMore = () => {
-    if (hasNextPage && !isFetchingNextPage) {
-      setPage(prev => prev + 1);
-      fetchNextPage();
-    }
+    // Simple pagination - just increment page
+    setPage(prev => prev + 1);
   };
 
   const renderEvent = ({ item }: { item: any }) => (
@@ -53,7 +48,7 @@ export default function EventsScreen() {
   );
 
   const renderFooter = () => {
-    if (isFetchingNextPage) {
+    if (isLoading) {
       return <LoadingSpinner text="Loading more events..." />;
     }
     return null;
