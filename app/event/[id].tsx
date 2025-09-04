@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useEvent, useRegisterEvent, useUserRegistrations } from '../../src/hooks/useEvents';
+import { useEvent, useRegisterEvent, useUserRegistrations, useCancelRegistration } from '../../src/hooks/useEvents';
 import { Button, LoadingSpinner } from '../../src/components';
 import { useAuth } from '../../src/providers/authProvider';
 import { UI_CONSTANTS } from '../../src/constants';
@@ -34,10 +34,9 @@ export default function EventDetailsScreen() {
   } = useUserRegistrations();
 
   const registerEventMutation = useRegisterEvent();
+  const cancelRegistrationMutation = useCancelRegistration();
 
-  const isRegistered = userRegistrations?.some(
-    (registration) => registration.eventId === id
-  );
+  const isRegistered = userRegistrations?.some((item: any) => item?.event?.id === id);
 
   const handleRegister = async () => {
     if (!event || !user) return;
@@ -63,6 +62,32 @@ export default function EventDetailsScreen() {
     } finally {
       setIsRegistering(false);
     }
+  };
+
+  const handleCancel = async () => {
+    if (!event || !user) return;
+
+    Alert.alert(
+      'Cancel Registration',
+      `Are you sure you want to cancel your registration for "${event.title}"?`,
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes, Cancel',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await cancelRegistrationMutation.mutateAsync(event.id);
+              Alert.alert('Cancelled', 'Your registration has been cancelled.', [
+                { text: 'OK', onPress: () => router.back() },
+              ]);
+            } catch (error) {
+              Alert.alert('Cancellation Failed', error instanceof Error ? error.message : 'Something went wrong');
+            }
+          },
+        },
+      ]
+    );
   };
 
   if (isLoadingEvent) {
@@ -174,14 +199,13 @@ export default function EventDetailsScreen() {
 
         <View style={styles.actionContainer}>
           {isRegistered ? (
-            <View style={styles.registeredContainer}>
-              <Ionicons
-                name="checkmark-circle"
-                size={normalize(24)}
-                color={UI_CONSTANTS.COLORS.SUCCESS}
-              />
-              <Text style={styles.registeredText}>You're registered for this event</Text>
-            </View>
+            <Button
+              title="Cancel Registration"
+              onPress={handleCancel}
+              loading={cancelRegistrationMutation.isPending}
+              style={[styles.registerButton, { backgroundColor: UI_CONSTANTS.COLORS.ERROR }]}
+              textStyle={{ color: '#FFFFFF' }}
+            />
           ) : (
             <Button
               title={

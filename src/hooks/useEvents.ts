@@ -98,18 +98,26 @@ export const useUserRegistrations = () => {
       if (!user?.id) return [];
       // Try dedicated registrations resource first
       const regs = await registrationService.getUserRegistrations(user.id);
-      if (regs.length > 0) return regs;
+      if (regs.length > 0) {
+        // Enrich with event details expected by the Dashboard UI
+        const items = await Promise.all(
+          regs.map(async (r) => ({
+            id: r.id,
+            event: await eventService.getEventById(r.eventId),
+          }))
+        );
+        return items;
+      }
       // Fallback: mirror from user document's registeredEventIds
       const u = await userService.getUserById(user.id);
       const ids = u.registeredEventIds || [];
-      // Map to minimal registration-like objects for UI
-      return ids.map((eventId, idx) => ({
-        id: `${user.id}-${eventId}-${idx}`,
-        userId: user.id,
-        eventId,
-        registeredAt: new Date().toISOString(),
-        status: 'confirmed' as const,
-      }));
+      const items = await Promise.all(
+        ids.map(async (eventId, idx) => ({
+          id: `${user.id}-${eventId}-${idx}`,
+          event: await eventService.getEventById(eventId),
+        }))
+      );
+      return items;
     },
     enabled: true,
     retry: 1,
