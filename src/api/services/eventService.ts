@@ -1,7 +1,12 @@
 import { apiClient } from '../client';
 import { API_ENDPOINTS, buildQueryParams, EventFilters } from '../endpoints';
-import { Event, Registration, PaginatedResponse } from '../../types';
+import { Event, PaginatedResponse } from '../../types';
+import { EventTransformer, ApiEvent } from '../transformers';
 
+/**
+ * Event Service
+ * Handles all event-related API operations with clean data transformation
+ */
 export class EventService {
   async getEvents(filters: EventFilters = {}): Promise<PaginatedResponse<Event>> {
     const queryString = buildQueryParams(filters);
@@ -9,50 +14,85 @@ export class EventService {
       ? `${API_ENDPOINTS.EVENTS.BASE}?${queryString}`
       : API_ENDPOINTS.EVENTS.BASE;
     
-    return apiClient.get<PaginatedResponse<Event>>(endpoint);
+    const rawEvents = await apiClient.get<ApiEvent[]>(endpoint);
+    const transformedEvents = EventTransformer.toEventArray(rawEvents);
+    
+    return {
+      data: transformedEvents,
+      total: transformedEvents.length,
+      page: filters.page || 1,
+      limit: filters.limit || 10,
+    };
   }
 
   async getEventById(id: string): Promise<Event> {
-    return apiClient.get<Event>(API_ENDPOINTS.EVENTS.BY_ID(id));
+    const rawEvent = await apiClient.get<ApiEvent>(API_ENDPOINTS.EVENTS.BY_ID(id));
+    return EventTransformer.toEvent(rawEvent);
   }
 
   async searchEvents(query: string, filters: Omit<EventFilters, 'search'> = {}): Promise<PaginatedResponse<Event>> {
-    const searchFilters = { ...filters, search: query };
-    const queryString = buildQueryParams(searchFilters);
-    const endpoint = `${API_ENDPOINTS.EVENTS.SEARCH}?${queryString}`;
+    // MockAPI doesn't have search endpoint, so we filter client-side
+    const allEvents = await this.getEvents();
     
-    return apiClient.get<PaginatedResponse<Event>>(endpoint);
+    const filteredEvents = allEvents.data.filter(event => 
+      event.title.toLowerCase().includes(query.toLowerCase()) ||
+      event.description.toLowerCase().includes(query.toLowerCase()) ||
+      event.location.toLowerCase().includes(query.toLowerCase())
+    );
+    
+    return {
+      data: filteredEvents,
+      total: filteredEvents.length,
+      page: filters.page || 1,
+      limit: filters.limit || 10,
+    };
   }
 
   async getFeaturedEvents(limit: number = 5): Promise<Event[]> {
-    const queryString = buildQueryParams({ limit });
-    const endpoint = `${API_ENDPOINTS.EVENTS.FEATURED}?${queryString}`;
-    
-    return apiClient.get<Event[]>(endpoint);
+    const allEvents = await this.getEvents();
+    return allEvents.data.slice(0, limit);
   }
 
   async getUpcomingEvents(limit: number = 10): Promise<Event[]> {
-    const queryString = buildQueryParams({ limit });
-    const endpoint = `${API_ENDPOINTS.EVENTS.UPCOMING}?${queryString}`;
+    const allEvents = await this.getEvents();
+    const now = new Date();
     
-    return apiClient.get<Event[]>(endpoint);
+    const upcomingEvents = allEvents.data.filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate > now;
+    });
+    
+    return upcomingEvents
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, limit);
   }
 
   async getEventsByCategory(category: string, filters: Omit<EventFilters, 'category'> = {}): Promise<PaginatedResponse<Event>> {
-    const queryString = buildQueryParams(filters);
-    const endpoint = queryString
-      ? `${API_ENDPOINTS.EVENTS.BY_CATEGORY(category)}?${queryString}`
-      : API_ENDPOINTS.EVENTS.BY_CATEGORY(category);
+    const allEvents = await this.getEvents();
     
-    return apiClient.get<PaginatedResponse<Event>>(endpoint);
+    const categoryEvents = allEvents.data.filter(event => 
+      event.title.toLowerCase().includes(category.toLowerCase()) ||
+      event.description.toLowerCase().includes(category.toLowerCase())
+    );
+    
+    return {
+      data: categoryEvents,
+      total: categoryEvents.length,
+      page: filters.page || 1,
+      limit: filters.limit || 10,
+    };
   }
 
   async createEvent(eventData: Omit<Event, 'id' | 'createdAt'>): Promise<Event> {
-    return apiClient.post<Event>(API_ENDPOINTS.EVENTS.BASE, eventData);
+    const apiEventData = EventTransformer.toApiEvent(eventData);
+    const rawEvent = await apiClient.post<ApiEvent>(API_ENDPOINTS.EVENTS.BASE, apiEventData);
+    return EventTransformer.toEvent(rawEvent);
   }
 
   async updateEvent(id: string, eventData: Partial<Event>): Promise<Event> {
-    return apiClient.put<Event>(API_ENDPOINTS.EVENTS.BY_ID(id), eventData);
+    const apiEventData = EventTransformer.toApiEvent(eventData);
+    const rawEvent = await apiClient.put<ApiEvent>(API_ENDPOINTS.EVENTS.BY_ID(id), apiEventData);
+    return EventTransformer.toEvent(rawEvent);
   }
 
   async deleteEvent(id: string): Promise<void> {

@@ -1,0 +1,79 @@
+|-- .expo
+    |-- README.md
+    |-- devices.json
+|-- .gitignore
+|-- App.tsx
+|-- MOCKAPI_SETUP.md
+|-- README.md
+|-- app
+    |-- (auth)
+        |-- _layout.tsx
+        |-- login.tsx
+        |-- signup.tsx
+    |-- (tabs)
+        |-- _layout.tsx
+        |-- dashboard.tsx
+        |-- events.tsx
+    |-- _layout.tsx
+    |-- auth
+    |-- event
+        |-- [id].tsx
+    |-- index.tsx
+    |-- tabs
+|-- app.json
+|-- assets
+    |-- adaptive-icon.png
+    |-- favicon.png
+    |-- icon.png
+    |-- splash-icon.png
+|-- index.ts
+|-- package-lock.json
+|-- package.json
+|-- src
+    |-- api
+        |-- client.ts
+        |-- endpoints.ts
+        |-- hooks
+            |-- index.ts
+            |-- useAuth.ts
+            |-- useEvents.ts
+            |-- useRegistrations.ts
+            |-- useUsers.ts
+        |-- index.ts
+        |-- services
+            |-- authService.ts
+            |-- eventService.ts
+            |-- index.ts
+            |-- registrationService.ts
+            |-- userService.ts
+        |-- transformers
+            |-- eventTransformer.ts
+            |-- index.ts
+            |-- registrationTransformer.ts
+            |-- types.ts
+            |-- userTransformer.ts
+    |-- components
+        |-- Button.tsx
+        |-- EventCard.tsx
+        |-- Input.tsx
+        |-- LoadingSpinner.tsx
+        |-- index.ts
+    |-- constants
+        |-- index.ts
+    |-- hooks
+        |-- useEvents.ts
+    |-- providers
+        |-- authProvider.tsx
+        |-- queryProvider.tsx
+    |-- services
+        |-- authService.ts
+        |-- eventService.ts
+    |-- types
+        |-- index.ts
+    |-- utils
+        |-- errorHandling.ts
+        |-- formatters.ts
+        |-- index.ts
+        |-- normalize.ts
+        |-- validation.ts
+|-- tsconfig.json

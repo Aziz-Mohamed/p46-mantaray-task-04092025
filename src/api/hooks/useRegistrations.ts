@@ -62,7 +62,17 @@ export const useRegisterEvent = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (eventId: string) => registrationService.registerForEvent(eventId),
+    mutationFn: ({ 
+      eventId, 
+      userId, 
+      userName, 
+      userEmail 
+    }: { 
+      eventId: string; 
+      userId: string; 
+      userName: string; 
+      userEmail: string; 
+    }) => registrationService.registerForEvent(eventId, userId, userName, userEmail),
     onSuccess: (newRegistration) => {
       // Invalidate user registrations
       queryClient.invalidateQueries({ 
